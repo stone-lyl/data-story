@@ -62,6 +62,7 @@ export const CsvFileRead: Computer = {
         console.warn(`[data-story] No files found matching pattern: ${resolvedPath}`);
       }
 
+      console.time('CsvFileRead');
       // Process each file found by glob
       for (const file of files) {
         try {
@@ -76,20 +77,18 @@ export const CsvFileRead: Computer = {
           let batch: any[] = [];
           // Process each record as it comes in
           for await (const record of stream) {
-            batch.push({
-              ...record,
-              _filePath: file,
-            });
+            Object.assign(record, { _filePath: file });
+            batch.push(record);
 
             if (batch.length >= batchSize) {
-              output.push([...batch]);
+              output.push(batch);
               batch = []; // Clear the batch
               yield;
             }
           }
           // Process any remaining records
           if (batch.length > 0) {
-            output.push([...batch]);
+            output.push(batch);
             yield;
           }
         } catch (fileError) {
@@ -99,6 +98,8 @@ export const CsvFileRead: Computer = {
       }
     } catch (error: any) {
       output.pushTo('errors', [serializeError(error)]);
+    } finally {
+      console.timeEnd('CsvFileRead');
     }
   },
 };
