@@ -475,6 +475,7 @@ __metadata:
   resolution: "@data-story/core@workspace:packages/core"
   dependencies:
     nanoid: "npm:^3.3.8"
+    rfdc: "npm:^1.4.1"
     rxjs: "npm:^7.8.1"
     vite-plugin-externalize-deps: "npm:^0.8.0"
     zod: "npm:^3.24.1"

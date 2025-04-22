@@ -86,6 +86,7 @@ yarn.lock
 *.swp
 *.swo
 .aider*
+*.vsix
 
 # Private
 private-analyze-build-size.js
