@@ -62,7 +62,6 @@ export const CsvFileRead: Computer = {
         console.warn(`[data-story] No files found matching pattern: ${resolvedPath}`);
       }
 
-      console.time('CsvFileRead');
       // Process each file found by glob
       for (const file of files) {
         try {
@@ -98,8 +97,6 @@ export const CsvFileRead: Computer = {
       }
     } catch (error: any) {
       output.pushTo('errors', [serializeError(error)]);
-    } finally {
-      console.timeEnd('CsvFileRead');
     }
   },
 };

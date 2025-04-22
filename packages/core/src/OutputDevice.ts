@@ -10,7 +10,6 @@ export type PortLinkMap = Record<PortName, LinkId[]>
 const rfdcInstance = rfdc();
 const formatItems = (items: ItemValue[]): ItemValue[] => {
   try {
-    // return structuredClone(items);
     return rfdcInstance(items);
   } catch (e) {
     try {
