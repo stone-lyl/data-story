@@ -74,13 +74,12 @@ export const CsvFileRead: Computer = {
           });
           const stream = fs.createReadStream(file).pipe(parser);
           let batch: any[] = [];
+
           // Process each record as it comes in
           for await (const record of stream) {
-            Object.assign(record, { _filePath: file });
-            batch.push(record);
-
+            batch.push(Object.assign({ _filePath: file }, record));
             if (batch.length >= batchSize) {
-              output.push(batch);
+              output.push(batch)
               batch = []; // Clear the batch
               yield;
             }

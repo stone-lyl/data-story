@@ -25,10 +25,9 @@ export const CsvFileWrite: Computer = {
       value: ',',
     }),
   ],
-  canRun({ input, isAvailable }) {
-    return isAvailable() && input.haveAllItemsAtInput('input');
-  },
-
+  // canRun({ input, isAvailable }) {
+  //   return isAvailable() && input.haveAllItemsAtInput('input');
+  // },
   async *run({ input, params, onComplete }) {
     try {
       const filePath = params.file_path as string;
@@ -63,7 +62,10 @@ export const CsvFileWrite: Computer = {
         return Array.from(columns);
       };
 
-      const incoming = input.pull();
+      let hasCompleted = false;
+      let incoming = input.pull();
+      let isFirstBatch = true;
+      console.time('CsvFileWrite stringifier');
 
       // Setup CSV stringifier
       const stringifier = stringify({
@@ -73,18 +75,32 @@ export const CsvFileWrite: Computer = {
       });
       stringifier.pipe(writeStream);
 
-      for (const item of incoming) {
-        stringifier.write(item.value);
-      }
-
       onComplete?.(() => {
+        hasCompleted = true;
+        incoming = [];
+        console.log('CsvFileWrite onComplete');
         stringifier.end();
       });
+      console.timeEnd('CsvFileWrite stringifier');
 
-      yield;
+      while(!hasCompleted) {
+        if (isFirstBatch) {
+          isFirstBatch = false;
+        } else {
+          incoming = input.pull();
+        }
+
+        for (const item of incoming) {
+          stringifier.write(item.value);
+        }
+
+        incoming = [];
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        yield;
+      }
     } catch (error: any) {
       console.error('Error writing file:', error);
       throw new Error(`Failed to write file: ${error.message}`);
     }
   },
-};
+}
